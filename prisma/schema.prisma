@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//Comando gerar model no db postgres(cmd na raiz do projeto): yarn prisma migrate dev
+
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  cpf_cnpj   String
+  city       String
+  zipcode    String
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+
+  posts    Posts[]
+  likes    Likes[]
+  messages Messages[]
+
+  @@map("users")
+}
+
+model Posts {
+  id         String    @id @default(uuid())
+  autor      String
+  avatarUrl  String
+  content    String
+  created_at DateTime? @default(now())
+  likes      Int
+
+  userId String 
+  user   User   @relation(fields: [userId], references: [id])
+
+  like Likes?
+
+  @@map("posts")
+}
+
+model Likes {
+  id String @id @default(uuid())
+
+  userId String 
+  user   User   @relation(fields: [userId], references: [id])
+
+  postId String @unique
+  posts  Posts  @relation(fields: [postId], references: [id])
+
+  @@map("likes")
+}
+
+model Messages {
+  id         String    @id @default(uuid())
+  name       String
+  owner      String
+  message    String
+  created_at DateTime? @default(now())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("messages")
+}
+
+model Coffee {
+  id         String    @id @default(uuid())
+  date       DateTime? @default(now())
+  dateParams String
+  type_Dura  String
+  type_Rio   String
+  type_7_8   String
+
+  @@map("coffee")
+}
